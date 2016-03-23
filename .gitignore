@@ -4,6 +4,9 @@
 *.o
 *.obj
 
+#Code::Blocks project
+*.cbp
+
 # Precompiled Headers
 *.gch
 *.pch
