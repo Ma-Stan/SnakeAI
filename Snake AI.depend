@@ -1,0 +1,33 @@
+# depslib dependency file v1.0
+1457862556 source:d:\snake ai\state.cpp
+	"state.h"
+	<vector>
+	<algorithm>
+
+1457952851 d:\snake ai\state.h
+	<vector>
+
+1457856662 source:d:\snake ai\main.cpp
+	"state.h"
+	"q_learn.h"
+	<cstdio>
+	<map>
+	<vector>
+	<ctime>
+	<algorithm>
+
+1457853311 source:d:\snake ai\q learn.cpp
+	"q learn.h"
+
+1457853695 d:\snake ai\q learn.h
+	"state.h"
+	<map>
+
+1457952296 source:d:\snake ai\q_learn.cpp
+	"q_learn.h"
+	<algorithm>
+
+1457856239 d:\snake ai\q_learn.h
+	"state.h"
+	<map>
+
