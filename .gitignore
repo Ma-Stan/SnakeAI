@@ -6,6 +6,8 @@
 
 #Code::Blocks project
 *.cbp
+*.depend
+*.layout
 
 # Precompiled Headers
 *.gch
