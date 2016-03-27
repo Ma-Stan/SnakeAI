@@ -5,6 +5,7 @@
 #define WIDTH (4)
 #define WARPING (false)
 #include <vector>
+#include "hash_state.h"
 
 using namespace std;
 
@@ -27,13 +28,14 @@ class state
 public :
     int make_move(int dir); //makes a move in a direction
     //(left, up, right, down)
-    bool operator < (const state &cp) const;
     void show (void);
     state (void)
     {
     }
-
+    //bool operator < (const state &cp) const;
     state (std::vector <pair <int,int> > val);
+
+    hash_state to_hash();
 
 };
 
