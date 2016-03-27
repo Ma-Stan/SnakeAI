@@ -1,9 +1,9 @@
 #include "q_learn.h"
 #include <algorithm>
 
-map <pair <state,int>,int> Q_val;
+unordered_map <pair <hash_state,int>,int,hash_state> Q_val;
 
-int get_Q_val(state x,int mov)
+int get_Q_val(hash_state x,int mov)
 {
     auto it=Q_val.find(std::make_pair(x,mov));
     if (it==Q_val.end())
@@ -15,7 +15,7 @@ int get_Q_val(state x,int mov)
         return it->second;
 }
 
-int propose_move(state cur)
+int propose_move(hash_state cur)
 {
     int val=rand()&127;
     if (val<10)
@@ -57,7 +57,7 @@ void play_game(int rate,int show)
     int alive=1;
     while (alive)
     {
-        int op=propose_move(cur);
+        int op=propose_move(cur.to_hash());
         state nxt=cur;
         int code=nxt.make_move(op);
         int reward;
@@ -81,17 +81,51 @@ void play_game(int rate,int show)
                         reward=500;
                 }
         reward*=100;
-        int mxnxt=get_Q_val(nxt,0);
+        hash_state nxt_hsh=nxt.to_hash();
+        int mxnxt=get_Q_val(nxt_hsh,0);
         for (int i=1; i<4; i++)
-            mxnxt=max(mxnxt,get_Q_val(nxt,i));
-        Q_val[std::make_pair(cur,op)]=((100-rate)*get_Q_val(cur,op)+rate*(reward+90*(alive?mxnxt:-3)/100))/100;
+            mxnxt=max(mxnxt,get_Q_val(nxt_hsh,i));
+        hash_state cur_hsh=cur.to_hash();
+        Q_val[std::make_pair(cur_hsh,op)]=((100-rate)*get_Q_val(cur_hsh,op)+rate*(reward+90*(alive?mxnxt:-3)/100))/100;
         if (show)
         {
             for (int i=0; i<4; i++)
-                printf("[%d] ",get_Q_val(cur,i));
+                printf("[%d] ",get_Q_val(cur_hsh,i));
             printf("%d %d %d\n",op,reward,Q_val.size());
             cur.show();
         }
         cur=nxt;
+    }
+}
+
+void load_from(string f)
+{
+    Q_val.clear();
+    FILE *fl=fopen(f.c_str(),"r");
+    int n;
+    fscanf(fl,"%d",&n);
+    int mov;
+    int val;
+    hash_state sta;
+    while (n--)
+    {
+        sta.init_from(fl);
+        fscanf(fl,"%d",&mov);
+        fscanf(fl,"%d",&val);
+        Q_val[make_pair(sta,mov)]=val;
+    }
+    fclose(fl);
+}
+
+void store_to(string f)
+{
+    FILE *fl=fopen(f.c_str(),"w");
+    fprintf(fl,"%d\n",Q_val.size());
+    for (auto it:Q_val)
+    {
+        it.first.first.save_to(fl);
+        fprintf(fl,"%d ",it.first.second);
+        fprintf(fl,"%d ",it.second);
+        fprintf(fl,"\n");
     }
 }

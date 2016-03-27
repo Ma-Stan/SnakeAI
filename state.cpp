@@ -2,23 +2,30 @@
 #include <vector>
 #include <algorithm>
 
+/*
 bool state :: operator < (const state &cp) const
 {
-    if (length!=cp.length)
-        return length<cp.length;
-    if (head_i!=cp.head_i)
-        return head_i<cp.head_i;
-    if (head_j!=cp.head_j)
-        return head_j<cp.head_j;
-    if (apple_i!=cp.apple_i)
-        return apple_i<cp.apple_i;
-    if (apple_j!=cp.apple_j)
-        return apple_j<cp.apple_j;
+    auto tup1=make_tuple(length,head_i,head_j,apple_i,apple_j);
+    auto tup2=make_tuple(cp.length,cp.head_i,cp.head_j,cp.apple_i,cp.apple_j);
+    if (tup1!=tup2)
+        return tup1<tup2;
     for (int i=0; i<HEIGHT; i++)
         for (int j=0; j<WIDTH; j++)
             if ((base[i][j]!=0)!=(cp.base[i][j]!=0))
                 return (base[i][j]!=0)<(cp.base[i][j]!=0);
     return 0;
+}
+*/
+
+
+hash_state state :: to_hash()
+{
+    long long brd=0;
+    for (int i=0; i<HEIGHT; i++)
+        for (int j=0; j<WIDTH; j++)
+            if (base[i][j])
+                brd|=1ll<<(i*WIDTH+j);
+    return hash_state(brd,head_i,head_j,apple_i,apple_j);
 }
 
 int state ::  gen_apple ()
