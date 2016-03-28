@@ -89,6 +89,7 @@ void play_game(int rate,int show)
         Q_val[std::make_pair(cur_hsh,op)]=((100-rate)*get_Q_val(cur_hsh,op)+rate*(reward+90*(alive?mxnxt:-3)/100))/100;
         if (show)
         {
+            printf("%I64d\n",cur.board_hash);
             for (int i=0; i<4; i++)
                 printf("[%d] ",get_Q_val(cur_hsh,i));
             printf("%d %d %d\n",op,reward,Q_val.size());
@@ -128,4 +129,5 @@ void store_to(string f)
         fprintf(fl,"%d ",it.second);
         fprintf(fl,"\n");
     }
+    fclose(fl);
 }

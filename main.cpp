@@ -25,7 +25,7 @@ int main()
             {
                 play_game(rt,shw);
                 if (i%10000==0)
-                    printf("%d/%d\n",i,num);
+                    printf("%d/%d [%d]\n",i,num,Q_val.size());
             }
             printf("Done!\n");
         }

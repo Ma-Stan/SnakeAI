@@ -3,6 +3,7 @@
 #include <algorithm>
 
 /*
+Commented out as legacy code.
 bool state :: operator < (const state &cp) const
 {
     auto tup1=make_tuple(length,head_i,head_j,apple_i,apple_j);
@@ -20,12 +21,7 @@ bool state :: operator < (const state &cp) const
 
 hash_state state :: to_hash()
 {
-    long long brd=0;
-    for (int i=0; i<HEIGHT; i++)
-        for (int j=0; j<WIDTH; j++)
-            if (base[i][j])
-                brd|=1ll<<(i*WIDTH+j);
-    return hash_state(brd,head_i,head_j,apple_i,apple_j);
+    return hash_state(board_hash,head_i,head_j,apple_i,apple_j);
 }
 
 int state ::  gen_apple ()
@@ -33,7 +29,7 @@ int state ::  gen_apple ()
     std::vector <std::pair <int,int> > avl;
     for (int i=0; i<HEIGHT; i++)
         for (int j=0; j<WIDTH; j++)
-            if (base[i][j]==0)
+            if (base[i][j]-offset<=0)
                 avl.push_back(std::make_pair(i,j));
     if (avl.empty())
     {
@@ -65,7 +61,7 @@ int state :: make_move(int dir)
     }
     if (nxt_i<0 || nxt_i>=HEIGHT || nxt_j<0 || nxt_j>=WIDTH)
         return -1;
-    if (base[nxt_i][nxt_j]>1)
+    if (base[nxt_i][nxt_j]-offset>1)
         return -1;
     int has_eaten;
     if (nxt_i==apple_i && nxt_j==apple_j)
@@ -78,12 +74,23 @@ int state :: make_move(int dir)
     head_j=nxt_j;
     if (!has_eaten)
     {
-        for (int i=0; i<HEIGHT; i++)
-            for (int j=0; j<WIDTH; j++)
-                if (base[i][j]>0)
-                    base[i][j]--;
+        offset++;
+        board_hash^=1ll<<(tail_i*WIDTH+tail_j);
+        for (int d=0; d<4; d++)
+        {
+            int x=tail_i+move_dif[d][0];
+            int y=tail_j+move_dif[d][1];
+            if (x>=0 && x<HEIGHT && y>=0 && y<WIDTH)
+                if (base[x][y]==base[tail_i][tail_j]+1)
+                {
+                    tail_i=x;
+                    tail_j=y;
+                    break;
+                }
+        }
     }
-    base[nxt_i][nxt_j]=length;
+    board_hash^=1ll<<(head_i*WIDTH+head_j);
+    base[nxt_i][nxt_j]=length+offset;
     if (has_eaten)
     {
         int gend=gen_apple();
@@ -94,7 +101,7 @@ int state :: make_move(int dir)
                 int x=nxt_i+move_dif[d][0];
                 int y=nxt_j+move_dif[d][1];
                 if (x>=0 && x<HEIGHT && y>=0 && y<WIDTH)
-                    if (base[x][y]==1)
+                    if (base[x][y]-offset==1)
                         return 3;
             }
             return 2;
@@ -108,6 +115,7 @@ int state :: make_move(int dir)
 
 void state :: show ()
 {
+    clear_offset();
     for (int i=0; i<HEIGHT; i++)
     {
         for (int j=0; j<WIDTH; j++)
@@ -121,13 +129,33 @@ void state :: show ()
 
 state :: state ( std::vector <std::pair <int,int> > l)
 {
+    board_hash=0;
     for (int i=0; i<HEIGHT; i++)
         for (int j=0; j<WIDTH; j++)
             base[i][j]=0;
     for (int i=0; i<(int)l.size(); i++)
+    {
         base[l[i].first][l[i].second]=l.size()-i;
+        board_hash|=1ll<<(l[i].first*WIDTH+l[i].second);
+    }
     head_i=l[0].first;
     head_j=l[0].second;
+    tail_i=l[l.size()-1].first;
+    tail_j=l[l.size()-1].second;
+    offset=0;
     length=l.size();
     gen_apple();
+}
+
+void state :: clear_offset()
+{
+    for (int i=0; i<HEIGHT; i++)
+        for (int j=0; j<WIDTH; j++)
+            base[i][j]=max(0,base[i][j]-offset);
+    offset=0;
+}
+
+state :: state (void)
+{
+
 }
